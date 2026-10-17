@@ -5,6 +5,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, root_mean_squared_error, r2_score
 from sklearn.dummy import DummyRegressor
 import matplotlib.pyplot as plt
+import numpy as np
 from sklearn.linear_model import Ridge
 
 
@@ -92,18 +93,36 @@ def main() -> None:
     print("MAE std: ", mae_folds.std())
 
     # ridge
-    alphas = [0.001, 0.01, 0.1, 1, 10, 100]
-    for alpha in alphas:
-        score = cross_val_score(Ridge(alpha=alpha), X_train, y_train, cv=5, scoring="neg_mean_absolute_error")
-        mae_folds_r = -score
+#    alphas = [0.001, 0.01, 0.1, 1, 10, 100]
+#    for alpha in alphas:
+#        score = cross_val_score(Ridge(alpha=alpha), X_train, y_train, cv=5, scoring="neg_mean_absolute_error")
+#        mae_folds_r = -score
+#
+#        print("\n")
+#        print("Ridge for alpha: ", alpha)
+#        print("MAE for every fold: ", mae_folds_r)
+#        print("MAE mean: ", mae_folds_r.mean())
+#        print("MAE std: ", mae_folds_r.std())
 
-        print("\n")
-        print("Ridge for alpha: ", alpha)
-        print("MAE for every fold: ", mae_folds_r)
-        print("MAE mean: ", mae_folds_r.mean())
-        print("MAE std: ", mae_folds_r.std())
 
+    ridge = Ridge(alpha=0.01)
+    ridge.fit(X_train, y_train)
+
+    coefficients = DataFrame({
+        "Feature": X_train.columns,
+        "LinearRegression": reg.coef_,
+        "Ridge": ridge.coef_,
+    })
+
+    print(coefficients.round(2).to_string(index=False))
+
+    print("Linear Regression:", np.linalg.norm(reg.coef_))
+    print("Ridge:", np.linalg.norm(ridge.coef_))
+
+    y_pred_ridge = ridge.predict(X_test)
+
+    print(calculate_metrics(y_test, y_pred_ridge))
 # Correlation 
-#    print(X_train.corr().round(2))
+    print(X_train.corr().round(2))
 if __name__ == "__main__":
     main()
