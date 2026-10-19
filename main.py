@@ -7,6 +7,8 @@ from sklearn.dummy import DummyRegressor
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.linear_model import Ridge
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import export_text
 
 
 def train_regression(X_train: DataFrame, y_train: Series) -> LinearRegression:
@@ -122,6 +124,19 @@ def main() -> None:
     y_pred_ridge = ridge.predict(X_test)
 
     print(calculate_metrics(y_test, y_pred_ridge))
+
+
+    tree = DecisionTreeRegressor(max_depth=2, random_state=42)
+
+    tree.fit(X_test, y_test)
+
+    print(
+        export_text(
+            tree,
+            feature_names=list(X_train.columns)
+        )
+    )
+
 # Correlation 
     print(X_train.corr().round(2))
 if __name__ == "__main__":
