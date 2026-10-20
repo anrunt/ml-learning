@@ -126,18 +126,56 @@ def main() -> None:
     print(calculate_metrics(y_test, y_pred_ridge))
 
 
-    tree = DecisionTreeRegressor(max_depth=2, random_state=42)
+    depths = [1, 2, 3, 4, 5, 8, 10, None]
+    depth_results = []
 
-    tree.fit(X_test, y_test)
+    for depth in depths:
+        tree = DecisionTreeRegressor(max_depth=depth, random_state=42)
 
-    print(
-        export_text(
-            tree,
-            feature_names=list(X_train.columns)
-        )
-    )
+        tree.fit(X_train, y_train)
+
+        y_pred_train = tree.predict(X_train)
+        train_mae = mean_absolute_error(y_train, y_pred_train)
+
+
+        cross_val_scores = cross_val_score(tree, X_train, y_train, cv=5, scoring="neg_mean_absolute_error")
+        mae_folds = -cross_val_scores
+
+        cv_mae = mae_folds.mean()
+
+        depth_results.append({
+            "max_depth": str(depth),
+            "Training MAE": train_mae,
+            "CV MAE": cv_mae,
+        })
+
+    depth_comparison = DataFrame(depth_results)
+    print("\nPorównanie głębokości drzewa:")
+    print(depth_comparison.round(2).to_string(index=False))
+
+#        print(
+#            export_text(
+#                tree,
+#                feature_names=list(X_train.columns)
+#            )
+#        )
+
+#        root = 0
+#
+#        left = tree.tree_.children_left[root]
+#        right = tree.tree_.children_right[root]
+#
+#        print("Feature:", X_train.columns[tree.tree_.feature[root]])
+#        print("Threshold:", tree.tree_.threshold[root])
+#
+#        print("Root MSE:", tree.tree_.impurity[root])
+#        print("Left MSE:", tree.tree_.impurity[left])
+#        print("Right MSE:", tree.tree_.impurity[right])
+#
+#        print("Left samples:", tree.tree_.n_node_samples[left])
+#        print("Right samples:", tree.tree_.n_node_samples[right])
 
 # Correlation 
-    print(X_train.corr().round(2))
+#    print(X_train.corr().round(2))
 if __name__ == "__main__":
     main()
