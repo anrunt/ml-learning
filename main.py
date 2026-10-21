@@ -1,3 +1,5 @@
+from typing import cast
+
 from pandas import DataFrame, Series
 from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split, cross_val_score
@@ -33,18 +35,17 @@ def calculate_metrics(y_true, y_pred) -> dict[str, float]:
 
 def main() -> None:
     # Load data
-    X: DataFrame
-    y: Series
-    X, y = load_diabetes(return_X_y=True, as_frame=True)
+    X, y = cast(
+        tuple[DataFrame, Series],
+        load_diabetes(return_X_y=True, as_frame=True),
+    )
 
     print(X.assign(target=y).head())
 
     # Split data
-    X_train, X_test, y_train, y_test = train_test_split(
-        X,
-        y,
-        test_size=0.2,
-        random_state=42,
+    X_train, X_test, y_train, y_test = cast(
+        tuple[DataFrame, DataFrame, Series, Series],
+        train_test_split(X, y, test_size=0.2, random_state=42),
     )
 
 
