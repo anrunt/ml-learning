@@ -1,6 +1,7 @@
 from typing import cast
 
 from pandas import DataFrame, Series
+from pandas.core.common import random_state
 from sklearn.datasets import load_diabetes
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.linear_model import LinearRegression
@@ -11,6 +12,7 @@ import numpy as np
 from sklearn.linear_model import Ridge
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.tree import export_text
+from sklearn.ensemble import RandomForestRegressor
 
 
 def train_regression(X_train: DataFrame, y_train: Series) -> LinearRegression:
@@ -154,6 +156,31 @@ def main() -> None:
     print("\nPorównanie głębokości drzewa:")
     print(depth_comparison.round(2).to_string(index=False))
 
+    max_depth = [2,4,6,8, None]
+
+    depth_results_forest = []
+    for depth in max_depth:
+        random_forest = RandomForestRegressor(n_estimators=100, max_depth=depth, random_state=42)
+
+        random_forest.fit(X_train, y_train)
+
+        y_pred_train = random_forest.predict(X_train)
+        train_mae = mean_absolute_error(y_train, y_pred_train)
+
+        cross_val_scores = cross_val_score(random_forest, X_train, y_train, cv=5, scoring="neg_mean_absolute_error")
+        mae_folds = -cross_val_scores
+
+        cv_mae = mae_folds.mean()
+
+        depth_results_forest.append({
+            "max_depth": str(depth),
+            "Training MAE": train_mae,
+            "CV MAE": cv_mae,
+        })
+
+    depth_comparison_forest = DataFrame(depth_results_forest)
+    print("\nPorównanie głębokości random forests:")
+    print(depth_comparison_forest.round(2).to_string(index=False))
 #        print(
 #            export_text(
 #                tree,
