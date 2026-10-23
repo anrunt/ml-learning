@@ -156,31 +156,55 @@ def main() -> None:
     print("\nPorównanie głębokości drzewa:")
     print(depth_comparison.round(2).to_string(index=False))
 
-    max_depth = [2,4,6,8, None]
+#    max_depth = [2,4,6,8, None]
+#
+#    depth_results_forest = []
+#    for depth in max_depth:
+#        random_forest = RandomForestRegressor(n_estimators=100, max_depth=depth, random_state=42)
+#
+#        random_forest.fit(X_train, y_train)
+#
+#        y_pred_train = random_forest.predict(X_train)
+#        train_mae = mean_absolute_error(y_train, y_pred_train)
+#
+#        cross_val_scores = cross_val_score(random_forest, X_train, y_train, cv=5, scoring="neg_mean_absolute_error")
+#        mae_folds = -cross_val_scores
+#
+#        cv_mae = mae_folds.mean()
+#
+#        depth_results_forest.append({
+#            "max_depth": str(depth),
+#            "Training MAE": train_mae,
+#            "CV MAE": cv_mae,
+#        })
+#
+#    depth_comparison_forest = DataFrame(depth_results_forest)
+#    print("\nPorównanie głębokości random forests:")
+#    print(depth_comparison_forest.round(2).to_string(index=False))
 
-    depth_results_forest = []
-    for depth in max_depth:
-        random_forest = RandomForestRegressor(n_estimators=100, max_depth=depth, random_state=42)
+    random_forest = RandomForestRegressor(n_estimators=100, max_depth=None, random_state=42, bootstrap=False)
 
-        random_forest.fit(X_train, y_train)
+    random_forest.fit(X_train, y_train)
 
-        y_pred_train = random_forest.predict(X_train)
-        train_mae = mean_absolute_error(y_train, y_pred_train)
+    # Wybierz pierwszego pacjenta z X_train
+    patient = X_train.iloc[[0]]
+    print(patient)
+    actual = y_train.iloc[0]
 
-        cross_val_scores = cross_val_score(random_forest, X_train, y_train, cv=5, scoring="neg_mean_absolute_error")
-        mae_folds = -cross_val_scores
+    # Predykcje każdego drzewa osobno
+#    predictions = [
+#        tree.predict(patient.to_numpy())[0]
+#        for tree in random_forest.estimators_
+#    ]
+#
+#    print("Actual:", actual)
+#    print("First 10 tree predictions:", np.round(predictions[:10], 2))
+#
+#    print("Mean of all trees:", np.mean(predictions))
+#    print("Random Forest prediction:", random_forest.predict(patient)[0])
 
-        cv_mae = mae_folds.mean()
 
-        depth_results_forest.append({
-            "max_depth": str(depth),
-            "Training MAE": train_mae,
-            "CV MAE": cv_mae,
-        })
 
-    depth_comparison_forest = DataFrame(depth_results_forest)
-    print("\nPorównanie głębokości random forests:")
-    print(depth_comparison_forest.round(2).to_string(index=False))
 #        print(
 #            export_text(
 #                tree,
